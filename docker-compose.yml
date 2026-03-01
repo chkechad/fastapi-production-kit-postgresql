@@ -1,0 +1,163 @@
+services:
+  app:
+    build:
+      context: .
+      target: dev
+    container_name: kit_fastapi
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/src/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - backend
+
+  # ==========================================
+  # PostgreSQL
+  # ==========================================
+  postgres:
+    image: postgres:17-alpine
+    container_name: kit_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+  # ==========================================
+  # pgAdmin
+  # ==========================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: kit_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend
+
+  # ==========================================
+  # Redis
+  # ==========================================
+  redis:
+    image: redis:7-alpine
+    container_name: kit_redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+  # ==========================================
+  # Celery Worker
+  # ==========================================
+  celery_worker:
+    build:
+      context: .
+      target: dev
+    container_name: kit_celery_worker
+    restart: unless-stopped
+    env_file: .env
+    command: uv run celery -A src.worker.celery_app worker --loglevel=info --concurrency=4
+    volumes:
+      - .:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - backend
+
+  # ==========================================
+  # Celery Beat (scheduler)
+  # ==========================================
+  celery_beat:
+    build:
+      context: .
+      target: dev
+    container_name: kit_celery_beat
+    restart: unless-stopped
+    env_file: .env
+    command: uv run celery -A src.worker.celery_app beat --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - backend
+
+  # ==========================================
+  # Flower (Celery UI)
+  # ==========================================
+  flower:
+    build:
+      context: .
+      target: dev
+    container_name: kit_flower
+    restart: unless-stopped
+    env_file: .env
+    command: uv run celery -A src.worker.celery_app flower --port=5555
+    ports:
+      - "5555:5555"
+    depends_on:
+      - celery_worker
+    networks:
+      - backend
+
+  # ==========================================
+  # Mailhog (fake SMTP)
+  # ==========================================
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: kit_mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+    networks:
+      - backend
+
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+  redis_data:
+
+networks:
+  backend:
+    driver: bridge
