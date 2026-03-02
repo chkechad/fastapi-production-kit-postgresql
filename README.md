@@ -1,5 +1,14 @@
 # fastapi-production-kit-postgresql
 
+![CI](https://github.com/chkechad/fastapi-production-kit-postgresql/actions/workflows/ci.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.13-blue.svg)
+![License](https://img.shields.io/github/license/chkechad/fastapi-production-kit-postgresql)
+![Last Commit](https://img.shields.io/github/last-commit/chkechad/fastapi-production-kit-postgresql)
+![Coverage](https://codecov.io/gh/chkechad/fastapi-production-kit-postgresql/branch/main/graph/badge.svg)
+[![Docs](https://img.shields.io/badge/docs-mkdocs%20material-blue?logo=materialformkdocs)](https://chkechad.github.io/fastapi-production-kit-postgresql/)
+
+
+
 > Production-ready FastAPI template inspired by Django's best practices.
 > Built with async PostgreSQL, Redis, Celery, JWT auth and a full developer toolchain.
 
