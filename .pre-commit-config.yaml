@@ -20,36 +20,36 @@ repos:
       - id: detect-private-key
       - id: check-merge-conflict
       - id: mixed-line-ending
-#  - repo: https://github.com/pre-commit/mirrors-mypy
-#    rev: v1.19.1
-#    hooks:
-#      - id: mypy
-#
-#  - repo: https://github.com/Yelp/detect-secrets
-#    rev: v1.5.0
-#    hooks:
-#      - id: detect-secrets
-#  - repo: https://github.com/asottile/pyupgrade
-#    rev: v3.21.2
-#    hooks:
-#      - id: pyupgrade
-#        args: [ "--py312-plus" ]
-#
-#  - repo: https://github.com/PyCQA/autoflake
-#    rev: v2.3.3
-#    hooks:
-#      - id: autoflake
-#        args:
-#          - --remove-all-unused-imports
-#          - --remove-unused-variables
-#          - --in-place
-#
-#  - repo: https://github.com/commitizen-tools/commitizen
-#    rev: v4.13.9
-#    hooks:
-#      - id: commitizen
-#        stages: [commit-msg]
-#
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.19.1
+    hooks:
+      - id: mypy
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.21.2
+    hooks:
+      - id: pyupgrade
+        args: [ "--py312-plus" ]
+
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.3
+    hooks:
+      - id: autoflake
+        args:
+          - --remove-all-unused-imports
+          - --remove-unused-variables
+          - --in-place
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.13.9
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
 #  - repo: https://github.com/PyCQA/bandit
 #    rev: 1.9.4
 #    hooks:
@@ -61,12 +61,12 @@ repos:
 #          - src
 #          - -x
 #          - tests
-#
-#  - repo: local
-#    hooks:
-#      - id: pytest
-#        name: pytest
-#        entry: uv run pytest -q -m "not slow"
-#        language: system
-#        pass_filenames: false
-#        stages: [pre-push]
+
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: uv run pytest -q -m "not slow"
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
